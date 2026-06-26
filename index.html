@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Ethiopian Bible"/>
+<meta name="theme-color" content="#0E0B05"/>
+<title>Ethiopian Orthodox Study Bible</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#0E0B05;font-family:Georgia,"Times New Roman",serif;color:#F0E0C0;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#6A4A1A;border-radius:2px;}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn 0.3s ease forwards;}
+.screen{display:none;min-height:100vh;background:linear-gradient(160deg,#0E0B05 0%,#1A1005 55%,#0E0B05 100%);}
+.screen.active{display:block;}
+#home-hero{text-align:center;padding:48px 18px 26px;border-bottom:1px solid rgba(200,160,80,0.18);}
+#home-hero .eyebrow{font-size:10px;letter-spacing:0.3em;color:#C8A050;text-transform:uppercase;margin-bottom:10px;}
+#home-hero h1{font-size:clamp(18px,5vw,32px);font-weight:normal;margin:0 0 8px;letter-spacing:0.04em;}
+#home-hero p{font-size:12px;color:#A88060;max-width:460px;margin:0 auto 20px;line-height:1.7;}
+#search-bar-home{display:flex;gap:8px;max-width:440px;margin:0 auto;}
+#home-books{max-width:840px;margin:0 auto;padding:24px 14px 60px;}
+.cat-header{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.cat-title{font-size:12px;font-weight:bold;letter-spacing:0.07em;}
+.cat-sub{font-size:10px;color:#A88060;}
+.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;margin-bottom:28px;}
+.book-card{background:rgba(255,255,255,0.04);border:1px solid rgba(200,160,80,0.17);border-radius:8px;padding:12px 13px;text-align:left;cursor:pointer;color:#F0E0C0;font-family:Georgia,serif;transition:background 0.15s;width:100%;}
+.book-card:hover,.book-card:active{background:rgba(255,255,255,0.09);}
+.book-card .bn{font-size:12.5px;font-weight:bold;margin-bottom:2px;line-height:1.3;}
+.book-card .ba{font-size:11px;margin-bottom:3px;}
+.book-card .bs{font-size:10.5px;color:#A88060;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(10,8,3,0.97);backdrop-filter:blur(6px);border-bottom:1px solid rgba(200,160,80,0.17);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.book-info{flex:1;min-width:80px;}
+.book-info .bname{font-size:13px;font-weight:bold;line-height:1.2;}
+.book-info .bamh{font-size:10px;}
+#ch-nav{display:flex;align-items:center;gap:5px;}
+#reader-body{max-width:700px;margin:0 auto;padding:28px 16px 80px;}
+#ch-header{margin-bottom:22px;}
+#ch-header .eyebrow{font-size:10px;letter-spacing:0.2em;color:#C8A050;text-transform:uppercase;margin-bottom:5px;}
+#ch-header h2{font-size:clamp(16px,4vw,22px);font-weight:normal;margin:0 0 5px;}
+.ch-divider{width:38px;height:2px;background:linear-gradient(90deg,#C8A050,transparent);margin-bottom:0;}
+#ch-notes{font-size:12px;color:#A88060;font-style:italic;line-height:1.65;margin-top:10px;padding-left:11px;border-left:2px solid rgba(200,160,80,0.2);}
+#study-toggle{margin-bottom:18px;}
+#study-panel{background:rgba(200,160,80,0.05);border:1px solid rgba(200,160,80,0.18);border-radius:10px;padding:18px 18px 14px;margin-bottom:22px;display:none;}
+#study-panel.open{display:block;}
+.study-sec{margin-bottom:15px;}
+.study-sec .slabel{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.study-sec .scontent{font-size:12.5px;color:#D0C0A0;line-height:1.72;padding-left:3px;}
+#verses-wrap{line-height:1.9;}
+.verse-row{display:flex;gap:11px;margin-bottom:8px;}
+.vnum{font-size:9px;color:#C8A050;font-weight:bold;min-width:20px;padding-top:4px;text-align:right;flex-shrink:0;}
+.vtext{font-size:14px;color:#EDE0C8;line-height:1.85;}
+#bottom-nav{display:flex;justify-content:space-between;margin-top:40px;padding-top:18px;border-top:1px solid rgba(200,160,80,0.15);}
+#search-body{max-width:680px;margin:0 auto;padding:26px 16px 60px;}
+.sr-item{background:rgba(255,255,255,0.04);border:1px solid rgba(200,160,80,0.17);border-radius:8px;padding:13px 15px;margin-bottom:9px;}
+.sr-ref{font-size:13px;color:#C8A050;font-weight:bold;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.sr-text{font-size:13px;color:#EDE0C8;line-height:1.75;margin-bottom:6px;}
+.sr-rel{font-size:11px;color:#A88060;font-style:italic;}
+#search-summary{background:rgba(200,160,80,0.07);border:1px solid rgba(200,160,80,0.18);border-radius:8px;padding:12px 15px;margin-bottom:16px;font-size:12.5px;color:#A88060;line-height:1.7;font-style:italic;}
+.inp{background:rgba(255,255,255,0.07);border:1px solid rgba(200,160,80,0.22);border-radius:7px;color:#F0E0C0;font-family:Georgia,serif;font-size:13px;padding:9px 12px;outline:none;width:100%;}
+.inp:focus{border-color:rgba(200,160,80,0.5);}
+.btn{background:rgba(200,160,80,0.12);border:1px solid rgba(200,160,80,0.32);border-radius:7px;color:#C8A050;font-family:Georgia,serif;font-size:12px;padding:8px 14px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn:hover,.btn:active{background:rgba(200,160,80,0.22);}
+.btn:disabled{opacity:0.35;cursor:default;}
+.btn-ghost{background:none;border:1px solid rgba(200,160,80,0.2);border-radius:7px;color:#A88060;font-family:Georgia,serif;font-size:11px;padding:6px 11px;cursor:pointer;}
+.btn-ghost:hover{color:#C8A050;border-color:rgba(200,160,80,0.4);}
+.btn-sm{font-size:11px;padding:5px 10px;}
+.ch-inp{width:44px;text-align:center;background:rgba(255,255,255,0.07);border:1px solid rgba(200,160,80,0.22);border-radius:6px;color:#F0E0C0;font-family:Georgia,serif;font-size:12px;padding:5px 2px;}
+.spinner{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 0;}
+.spinner .ring{width:30px;height:30px;border:3px solid rgba(200,160,80,0.15);border-top-color:#C8A050;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:14px;}
+.spinner p{font-size:12px;color:#A88060;}
+.errbox{background:rgba(180,40,40,0.12);border:1px solid rgba(180,40,40,0.3);border-radius:8px;padding:16px 18px;color:#E8A0A0;text-align:center;margin-bottom:18px;}
+.hidden{display:none!important;}
+.sermon-box{background:rgba(200,160,80,0.07);border:1px solid rgba(200,160,80,0.2);border-radius:6px;padding:10px 13px;font-size:12.5px;line-height:1.7;color:#D0C0A0;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div id="home-hero">
+    <div class="eyebrow">Ethiopian Orthodox Tewahedo Church</div>
+    <h1>Complete Ethiopian Study Bible</h1>
+    <p>All 81 books of the Ethiopian Orthodox canon — full text, scholarly commentary, and sermon preparation tools.</p>
+    <div id="search-bar-home">
+      <input class="inp" id="home-search-inp" placeholder="Search topics, people, themes…" type="text"/>
+      <button class="btn" onclick="goSearch()">Search</button>
+    </div>
+  </div>
+  <div id="home-books"></div>
+</div>
+
+<!-- READER -->
+<div id="reader" class="screen">
+  <div class="topbar">
+    <button class="btn-ghost" onclick="showHome()">← Books</button>
+    <button class="btn-ghost" onclick="showSearch()">🔍</button>
+    <div class="book-info">
+      <div class="bname" id="tb-bname"></div>
+      <div class="bamh" id="tb-bamh"></div>
+    </div>
+    <div id="ch-nav">
+      <button class="btn btn-sm" id="btn-prev" onclick="navCh(-1)">‹</button>
+      <input class="ch-inp" type="number" id="ch-inp" min="1" onkeydown="if(event.key==='Enter')goCh()"/>
+      <span style="font-size:10px;color:#A88060;" id="ch-total"></span>
+      <button class="btn btn-sm" onclick="goCh()">Go</button>
+      <button class="btn btn-sm" id="btn-next" onclick="navCh(1)">›</button>
+    </div>
+  </div>
+  <div id="reader-body">
+    <div id="reader-spinner" class="spinner hidden"><div class="ring"></div><p id="spinner-txt">Loading…</p></div>
+    <div id="reader-err" class="errbox hidden"></div>
+    <div id="reader-content" class="hidden">
+      <div id="ch-header">
+        <div class="eyebrow" id="ch-eyebrow"></div>
+        <h2 id="ch-title"></h2>
+        <div id="ch-divider" class="ch-divider hidden"></div>
+        <div id="ch-notes" class="hidden"></div>
+      </div>
+      <div id="study-toggle">
+        <button class="btn" id="study-btn" onclick="toggleStudy()">📖 Open Study &amp; Sermon Notes</button>
+      </div>
+      <div id="study-panel">
+        <div style="font-size:10px;letter-spacing:0.16em;color:#C8A050;text-transform:uppercase;margin-bottom:14px;" id="study-head"></div>
+        <div id="study-content"></div>
+      </div>
+      <div id="verses-wrap"></div>
+      <div id="bottom-nav">
+        <button class="btn" id="btn-prev2" onclick="navCh(-1)">← Previous</button>
+        <button class="btn" id="btn-next2" onclick="navCh(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div id="search" class="screen">
+  <div class="topbar">
+    <button class="btn-ghost" onclick="showHome()">← Home</button>
+    <span style="font-size:15px;font-weight:normal;color:#F0E0C0;flex:1;">Search the Ethiopian Canon</span>
+  </div>
+  <div id="search-body">
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <input class="inp" id="search-inp" placeholder="e.g. fallen angels, covenant, Adam, resurrection…" type="text" onkeydown="if(event.key==='Enter')runSearch()"/>
+      <button class="btn" onclick="runSearch()" id="search-btn">Search</button>
+    </div>
+    <div id="search-spinner" class="spinner hidden"><div class="ring"></div><p>Searching…</p></div>
+    <div id="search-err" class="errbox hidden"></div>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES=[
+  {label:"Old Testament — Standard Books",color:"#C8A050",desc:"39 books shared with Protestant canon",books:[
+    {id:"genesis",name:"Genesis",amharic:"ዘፍጥረት",chapters:50,sub:"Torah"},
+    {id:"exodus",name:"Exodus",amharic:"ዘጸአት",chapters:40,sub:"Torah"},
+    {id:"leviticus",name:"Leviticus",amharic:"ዘሌዋውያን",chapters:27,sub:"Torah"},
+    {id:"numbers",name:"Numbers",amharic:"ዘቁጥር",chapters:36,sub:"Torah"},
+    {id:"deuteronomy",name:"Deuteronomy",amharic:"ዘዳግም",chapters:34,sub:"Torah"},
+    {id:"joshua",name:"Joshua",amharic:"ኢያሱ",chapters:24,sub:"History"},
+    {id:"judges",name:"Judges",amharic:"መሳፍንት",chapters:21,sub:"History"},
+    {id:"ruth",name:"Ruth",amharic:"ሩት",chapters:4,sub:"History"},
+    {id:"1samuel",name:"1 Samuel",amharic:"፩ሳሙኤል",chapters:31,sub:"History"},
+    {id:"2samuel",name:"2 Samuel",amharic:"፪ሳሙኤል",chapters:24,sub:"History"},
+    {id:"1kings",name:"1 Kings",amharic:"፩ነገሥት",chapters:22,sub:"History"},
+    {id:"2kings",name:"2 Kings",amharic:"፪ነገሥት",chapters:25,sub:"History"},
+    {id:"1chronicles",name:"1 Chronicles",amharic:"፩ዜና መዋዕል",chapters:29,sub:"History"},
+    {id:"2chronicles",name:"2 Chronicles",amharic:"፪ዜና መዋዕል",chapters:36,sub:"History"},
+    {id:"ezra",name:"Ezra",amharic:"ዕዝራ",chapters:10,sub:"History"},
+    {id:"nehemiah",name:"Nehemiah",amharic:"ነህምያ",chapters:13,sub:"History"},
+    {id:"esther",name:"Esther",amharic:"አስቴር",chapters:10,sub:"History"},
+    {id:"job",name:"Job",amharic:"ኢዮብ",chapters:42,sub:"Wisdom"},
+    {id:"psalms",name:"Psalms",amharic:"መዝሙረ ዳዊት",chapters:150,sub:"Poetry"},
+    {id:"proverbs",name:"Proverbs",amharic:"ምሳሌ",chapters:31,sub:"Wisdom"},
+    {id:"ecclesiastes",name:"Ecclesiastes",amharic:"መክብብ",chapters:12,sub:"Wisdom"},
+    {id:"songofsolomon",name:"Song of Solomon",amharic:"መኃልየ መኃልይ",chapters:8,sub:"Poetry"},
+    {id:"isaiah",name:"Isaiah",amharic:"ኢሳይያስ",chapters:66,sub:"Major Prophet"},
+    {id:"jeremiah",name:"Jeremiah",amharic:"ኤርምያስ",chapters:52,sub:"Major Prophet"},
+    {id:"lamentations",name:"Lamentations",amharic:"ሰቆቃወ ኤርምያስ",chapters:5,sub:"Major Prophet"},
+    {id:"ezekiel",name:"Ezekiel",amharic:"ሕዝቅኤል",chapters:48,sub:"Major Prophet"},
+    {id:"daniel",name:"Daniel",amharic:"ዳንኤል",chapters:12,sub:"Major Prophet"},
+    {id:"hosea",name:"Hosea",amharic:"ሆሴዕ",chapters:14,sub:"Minor Prophet"},
+    {id:"joel",name:"Joel",amharic:"ኢዩኤል",chapters:3,sub:"Minor Prophet"},
+    {id:"amos",name:"Amos",amharic:"አሞጽ",chapters:9,sub:"Minor Prophet"},
+    {id:"obadiah",name:"Obadiah",amharic:"አብድዩ",chapters:1,sub:"Minor Prophet"},
+    {id:"jonah",name:"Jonah",amharic:"ዮናስ",chapters:4,sub:"Minor Prophet"},
+    {id:"micah",name:"Micah",amharic:"ሚክያስ",chapters:7,sub:"Minor Prophet"},
+    {id:"nahum",name:"Nahum",amharic:"ናሆም",chapters:3,sub:"Minor Prophet"},
+    {id:"habakkuk",name:"Habakkuk",amharic:"ዕንባቆም",chapters:3,sub:"Minor Prophet"},
+    {id:"zephaniah",name:"Zephaniah",amharic:"ሶፎንያስ",chapters:3,sub:"Minor Prophet"},
+    {id:"haggai",name:"Haggai",amharic:"ሐጌ",chapters:2,sub:"Minor Prophet"},
+    {id:"zechariah",name:"Zechariah",amharic:"ዘካርያስ",chapters:14,sub:"Minor Prophet"},
+    {id:"malachi",name:"Malachi",amharic:"ሚልክያስ",chapters:4,sub:"Minor Prophet"},
+  ]},
+  {label:"New Testament — Standard Books",color:"#7EB8A0",desc:"27 books of the New Testament",books:[
+    {id:"matthew",name:"Matthew",amharic:"ማቴዎስ",chapters:28,sub:"Gospel"},
+    {id:"mark",name:"Mark",amharic:"ማርቆስ",chapters:16,sub:"Gospel"},
+    {id:"luke",name:"Luke",amharic:"ሉቃስ",chapters:24,sub:"Gospel"},
+    {id:"john",name:"John",amharic:"ዮሐንስ",chapters:21,sub:"Gospel"},
+    {id:"acts",name:"Acts",amharic:"የሐዋርያት ሥራ",chapters:28,sub:"History"},
+    {id:"romans",name:"Romans",amharic:"ሮሜ",chapters:16,sub:"Epistle"},
+    {id:"1corinthians",name:"1 Corinthians",amharic:"፩ቆሮንቶስ",chapters:16,sub:"Epistle"},
+    {id:"2corinthians",name:"2 Corinthians",amharic:"፪ቆሮንቶስ",chapters:13,sub:"Epistle"},
+    {id:"galatians",name:"Galatians",amharic:"ገላትያ",chapters:6,sub:"Epistle"},
+    {id:"ephesians",name:"Ephesians",amharic:"ኤፌሶን",chapters:6,sub:"Epistle"},
+    {id:"philippians",name:"Philippians",amharic:"ፊልጵስዩስ",chapters:4,sub:"Epistle"},
+    {id:"colossians",name:"Colossians",amharic:"ቆላስይስ",chapters:4,sub:"Epistle"},
+    {id:"1thessalonians",name:"1 Thessalonians",amharic:"፩ተሰሎንቄ",chapters:5,sub:"Epistle"},
+    {id:"2thessalonians",name:"2 Thessalonians",amharic:"፪ተሰሎንቄ",chapters:3,sub:"Epistle"},
+    {id:"1timothy",name:"1 Timothy",amharic:"፩ጢሞቴዎስ",chapters:6,sub:"Epistle"},
+    {id:"2timothy",name:"2 Timothy",amharic:"፪ጢሞቴዎስ",chapters:4,sub:"Epistle"},
+    {id:"titus",name:"Titus",amharic:"ቲቶ",chapters:3,sub:"Epistle"},
+    {id:"philemon",name:"Philemon",amharic:"ፊልሞና",chapters:1,sub:"Epistle"},
+    {id:"hebrews",name:"Hebrews",amharic:"ዕብራውያን",chapters:13,sub:"Epistle"},
+    {id:"james",name:"James",amharic:"ያዕቆብ",chapters:5,sub:"Epistle"},
+    {id:"1peter",name:"1 Peter",amharic:"፩ጴጥሮስ",chapters:5,sub:"Epistle"},
+    {id:"2peter",name:"2 Peter",amharic:"፪ጴጥሮስ",chapters:3,sub:"Epistle"},
+    {id:"1john",name:"1 John",amharic:"፩ዮሐንስ",chapters:5,sub:"Epistle"},
+    {id:"2john",name:"2 John",amharic:"፪ዮሐንስ",chapters:1,sub:"Epistle"},
+    {id:"3john",name:"3 John",amharic:"፫ዮሐንስ",chapters:1,sub:"Epistle"},
+    {id:"jude",name:"Jude",amharic:"ይሁዳ",chapters:1,sub:"Epistle"},
+    {id:"revelation",name:"Revelation",amharic:"ራዕይ",chapters:22,sub:"Apocalypse"},
+  ]},
+  {label:"Unique to Ethiopia",color:"#E8A030",desc:"Found in no other Christian canon worldwide",books:[
+    {id:"enoch",name:"Book of Enoch",amharic:"መጽሐፈ ሄኖክ",chapters:108,sub:"1 Enoch — Ethiopic"},
+    {id:"jubilees",name:"Book of Jubilees",amharic:"መጽሐፈ ኩፋሌ",chapters:50,sub:"The Lesser Genesis"},
+    {id:"meqabyan1",name:"1 Meqabyan",amharic:"፩ መቃብያን",chapters:36,sub:"First Meqabyan"},
+    {id:"meqabyan2",name:"2 Meqabyan",amharic:"፪ መቃብያን",chapters:10,sub:"Second Meqabyan"},
+    {id:"meqabyan3",name:"3 Meqabyan",amharic:"፫ መቃብያን",chapters:10,sub:"Third Meqabyan"},
+    {id:"nicodemus",name:"Gospel of Nicodemus",amharic:"ወንጌለ ኒቆዲሞስ",chapters:16,sub:"Acts of Pilate"},
+    {id:"covenant",name:"Book of the Covenant",amharic:"መጽሐፈ ኪዳን",chapters:4,sub:"Covenant Theology"},
+    {id:"adamneve",name:"Book of Adam and Eve",amharic:"መጽሐፈ አዳምና ሔዋን",chapters:55,sub:"Life of Adam and Eve"},
+    {id:"josippon",name:"Josippon",amharic:"ዮሴፍ ወልደ ቆርዮን",chapters:10,sub:"Ethiopian-Jewish History"},
+    {id:"teezaza_sanbat",name:"Teezaza Sanbat",amharic:"ተዕዛዘ ሰንበት",chapters:6,sub:"Sabbath Commandments"},
+    {id:"arde_et",name:"Arde'et",amharic:"አርደዕት",chapters:5,sub:"Disciples of Jesus"},
+    {id:"nagara_muse",name:"Nagara Muse",amharic:"ነገረ ሙሴ",chapters:4,sub:"Story of Moses"},
+    {id:"book_of_mysteries",name:"Book of Mysteries of Heaven and Earth",amharic:"ምስጢረ ሰማይ ወምድር",chapters:8,sub:"Cosmological Text"},
+  ]},
+  {label:"Ethiopian & Catholic Deuterocanon",color:"#A0C890",desc:"In Ethiopian and Catholic Bibles; absent from Protestant",books:[
+    {id:"tobit",name:"Book of Tobit",amharic:"መጽሐፈ ጦቢት",chapters:14,sub:"Deuterocanonical"},
+    {id:"judith",name:"Book of Judith",amharic:"መጽሐፈ ዩዲት",chapters:16,sub:"Deuterocanonical"},
+    {id:"wisdom",name:"Wisdom of Solomon",amharic:"ጥበበ ሰሎሞን",chapters:19,sub:"Deuterocanonical"},
+    {id:"sirach",name:"Sirach (Ecclesiasticus)",amharic:"መጽሐፈ ሲራክ",chapters:51,sub:"Ben Sira"},
+    {id:"baruch",name:"Book of Baruch",amharic:"መጽሐፈ ባሩክ",chapters:6,sub:"Includes Letter of Jeremiah"},
+    {id:"1maccabees",name:"1 Maccabees",amharic:"፩ መቃቢስ",chapters:16,sub:"Deuterocanonical"},
+    {id:"2maccabees",name:"2 Maccabees",amharic:"፪ መቃቢስ",chapters:15,sub:"Deuterocanonical"},
+    {id:"additions_esther",name:"Additions to Esther",amharic:"ዕዝራ ሱቱኤል",chapters:7,sub:"Greek Esther Additions"},
+    {id:"additions_daniel",name:"Additions to Daniel",amharic:"ዳንኤል (ተጨማሪ)",chapters:3,sub:"Azariah, Susanna, Bel"},
+  ]},
+  {label:"Ethiopian Orthodox Additions",color:"#A07EB8",desc:"Present in Ethiopian canon beyond Catholic",books:[
+    {id:"1esdras",name:"1 Esdras",amharic:"፩ ዕዝራ",chapters:9,sub:"Greek Esdras"},
+    {id:"2esdras",name:"2 Esdras (4 Ezra)",amharic:"፪ ዕዝራ",chapters:16,sub:"Apocalypse of Ezra"},
+    {id:"prayer_manasseh",name:"Prayer of Manasseh",amharic:"ጸሎተ ምናሴ",chapters:1,sub:"Penitential Prayer"},
+    {id:"psalm151",name:"Psalm 151",amharic:"መዝሙር ፻፶፩",chapters:1,sub:"Extra-canonical Psalm"},
+    {id:"3maccabees",name:"3 Maccabees",amharic:"፫ መቃቢስ",chapters:7,sub:"Ptolemaic Persecution"},
+    {id:"4maccabees",name:"4 Maccabees",amharic:"፬ መቃቢስ",chapters:18,sub:"Philosophical Martyrdom"},
+    {id:"rest_words_baruch",name:"Rest of Words of Baruch",amharic:"ቀሪ ቃላተ ባሩክ",chapters:9,sub:"Paraleipomena Jeremiou"},
+    {id:"ascension_isaiah",name:"Ascension of Isaiah",amharic:"ዕርገተ ኢሳይያስ",chapters:11,sub:"Vision and Martyrdom"},
+    {id:"apocalypse_ezra",name:"Apocalypse of Ezra",amharic:"ራዕየ ዕዝራ",chapters:7,sub:"Ethiopian Ezra Vision"},
+    {id:"book_of_joseph",name:"Book of Joseph ben Gorion",amharic:"መጽሐፈ ዮሴፍ",chapters:8,sub:"Ethiopic History"},
+  ]},
+  {label:"Ethiopian Ecclesiastical Books",color:"#B87070",desc:"Canonical church order and liturgical texts",books:[
+    {id:"didascalia",name:"Didascalia",amharic:"ዲድስቅልያ",chapters:26,sub:"Apostolic Church Order"},
+    {id:"clement",name:"Epistle of Clement",amharic:"መልእክተ ቀሌምንጦስ",chapters:8,sub:"Apostolic Letter"},
+    {id:"didache",name:"Didache",amharic:"ዲዳኬ",chapters:16,sub:"Teaching of the Twelve Apostles"},
+    {id:"shepherd_hermas",name:"Shepherd of Hermas",amharic:"እረኛ ሄርማስ",chapters:10,sub:"Early Christian Apocalypse"},
+    {id:"sinodos",name:"Sinodos",amharic:"ሲኖዶስ",chapters:4,sub:"Apostolic Canons and Liturgy"},
+    {id:"book_of_the_covenant2",name:"Second Book of the Covenant",amharic:"፪ መጽሐፈ ኪዳን",chapters:3,sub:"Liturgical Covenant"},
+    {id:"ethiopic_didache",name:"Ethiopic Didache",amharic:"ኢትዮጵያዊ ዲዳኬ",chapters:4,sub:"Ethiopian Apostolic Teaching"},
+  ]}
+];
+
+const ALL_BOOKS=CATEGORIES.flatMap(c=>c.books.map(b=>({...b,catColor:c.color,catLabel:c.label})));
+
+let curBook=null,curChapter=1,studyLoaded=false,studyPanelOpen=false;
+
+const CHAPTER_SYS=`You are a biblical scholar of the complete Ethiopian Orthodox Tewahedo Church 81-book canon. When given a book and chapter, respond ONLY with valid JSON, no markdown, no preamble: {"chapter":<n>,"title":"<short title or empty>","verses":[{"num":1,"text":"verse text"},...],"notes":"<1-2 sentence note or empty>"}. For OT/NT use ESV. For deuterocanon use NRSV. For Enoch/Jubilees use R.H. Charles modernized. For unique Ethiopian books render faithfully from Ethiopian tradition. Include ALL verses. Return ONLY valid JSON.`;
+
+const STUDY_SYS=`You are a seminary professor and senior pastor deeply versed in the Ethiopian Orthodox Tewahedo Church canon and expository preaching. When given a book and chapter, respond ONLY with valid JSON, no markdown: {"theological_theme":"<1 sentence>","historical_context":"<2-3 sentences>","key_verses":["<ref: text>","<ref: text>"],"interpretation":"<3-4 sentences>","sermon_angle":"<title + 2-3 sentence homiletical direction>","cross_references":["<ref — connection>","<ref — connection>","<ref — connection>"],"application":"<2-3 sentences>","ethiopian_context":"<1-2 sentences on Ethiopian Orthodox significance>"}. Return ONLY valid JSON.`;
+
+const SEARCH_SYS=`You are a biblical scholar of the complete Ethiopian Orthodox 81-book canon. Given a query, respond ONLY with valid JSON: {"results":[{"book":"<name>","chapter":<n>,"verse":<n>,"text":"<verse>","relevance":"<1 sentence>"}],"summary":"<2-3 sentence overview>"}. Return 8 most relevant results from across the full canon. Return ONLY valid JSON.`;
+
+async function callClaude(system,msg){
+  const r=await fetch('/api/claude',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system,messages:[{role:'user',content:msg}]})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message||d.error);
+  const raw=(d.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+  return JSON.parse(raw);
+}
+
+function showHome(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('home').classList.add('active');window.scrollTo(0,0);}
+function showSearch(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('search').classList.add('active');window.scrollTo(0,0);setTimeout(()=>document.getElementById('search-inp').focus(),100);}
+
+function showReader(book,ch){
+  curBook=book;curChapter=ch||1;studyLoaded=false;studyPanelOpen=false;
+  document.getElementById('tb-bname').textContent=book.name;
+  document.getElementById('tb-bamh').textContent=book.amharic;
+  document.getElementById('tb-bamh').style.color=book.catColor;
+  document.getElementById('ch-total').textContent='/ '+book.chapters;
+  document.getElementById('ch-inp').value=curChapter;
+  document.getElementById('ch-inp').max=book.chapters;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('reader').classList.add('active');
+  window.scrollTo(0,0);
+  loadChapter();
+}
+
+function goSearch(){
+  const q=document.getElementById('home-search-inp').value.trim();
+  if(!q)return;
+  showSearch();
+  document.getElementById('search-inp').value=q;
+  runSearch();
+}
+
+function loadChapter(){
+  document.getElementById('reader-content').classList.add('hidden');
+  document.getElementById('reader-err').classList.add('hidden');
+  document.getElementById('reader-spinner').classList.remove('hidden');
+  document.getElementById('spinner-txt').textContent='Loading '+curBook.name+' Chapter '+curChapter+'…';
+  document.getElementById('study-panel').classList.remove('open');
+  document.getElementById('study-btn').textContent='📖 Open Study & Sermon Notes';
+  document.getElementById('ch-inp').value=curChapter;
+  document.getElementById('btn-prev').disabled=curChapter<=1;
+  document.getElementById('btn-prev2').disabled=curChapter<=1;
+  document.getElementById('btn-next').disabled=curChapter>=curBook.chapters;
+  document.getElementById('btn-next2').disabled=curChapter>=curBook.chapters;
+  studyLoaded=false;studyPanelOpen=false;
+
+  callClaude(CHAPTER_SYS,curBook.name+', Chapter '+curChapter)
+    .then(renderChapter)
+    .catch(()=>{
+      document.getElementById('reader-spinner').classList.add('hidden');
+      const eb=document.getElementById('reader-err');
+      eb.innerHTML='Could not load this chapter. Please check your internet and try again.<br><br><button class="btn" onclick="loadChapter()">Try Again</button>';
+      eb.classList.remove('hidden');
+    });
+}
+
+function renderChapter(data){
+  document.getElementById('reader-spinner').classList.add('hidden');
+  document.getElementById('ch-eyebrow').textContent=curBook.name;
+  document.getElementById('ch-title').textContent='Chapter '+data.chapter+(data.title?' — '+data.title:'');
+  const div=document.getElementById('ch-divider');
+  const notes=document.getElementById('ch-notes');
+  if(data.notes){div.classList.remove('hidden');notes.textContent=data.notes;notes.classList.remove('hidden');}
+  else{div.classList.add('hidden');notes.classList.add('hidden');}
+  const vw=document.getElementById('verses-wrap');
+  vw.innerHTML='';
+  (data.verses||[]).forEach(v=>{
+    const row=document.createElement('div');
+    row.className='verse-row';
+    row.innerHTML='<span class="vnum">'+v.num+'</span><span class="vtext">'+v.text+'</span>';
+    vw.appendChild(row);
+  });
+  document.getElementById('study-head').textContent='Study & Sermon Notes — '+curBook.name+' Ch.'+curChapter;
+  document.getElementById('study-content').innerHTML='';
+  const c=document.getElementById('reader-content');
+  c.classList.remove('hidden','fade');void c.offsetWidth;c.classList.add('fade');
+}
+
+function navCh(dir){
+  const next=curChapter+dir;
+  if(next<1||next>curBook.chapters)return;
+  curChapter=next;window.scrollTo(0,0);loadChapter();
+}
+
+function goCh(){
+  const n=parseInt(document.getElementById('ch-inp').value);
+  if(isNaN(n)||n<1||n>curBook.chapters)return;
+  curChapter=n;window.scrollTo(0,0);loadChapter();
+}
+
+function toggleStudy(){
+  if(!studyLoaded){
+    document.getElementById('study-btn').textContent='📖 Loading study notes…';
+    callClaude(STUDY_SYS,curBook.name+', Chapter '+curChapter)
+      .then(data=>{
+        studyLoaded=true;renderStudy(data);
+        document.getElementById('study-panel').classList.add('open');
+        document.getElementById('study-btn').textContent='📖 Hide Study & Sermon Notes';
+        studyPanelOpen=true;
+      })
+      .catch(()=>{
+        document.getElementById('study-btn').textContent='📖 Open Study & Sermon Notes';
+        alert('Could not load study notes. Please try again.');
+      });
+  } else {
+    studyPanelOpen=!studyPanelOpen;
+    document.getElementById('study-panel').classList.toggle('open',studyPanelOpen);
+    document.getElementById('study-btn').textContent=studyPanelOpen?'📖 Hide Study & Sermon Notes':'📖 Open Study & Sermon Notes';
+  }
+}
+
+function renderStudy(d){
+  const sc=document.getElementById('study-content');
+  sc.innerHTML='';
+  const secs=[
+    {icon:'✦',label:'Theological Theme',color:'#C8A050',content:d.theological_theme},
+    {icon:'📜',label:'Historical Context',color:'#7EB8A0',content:d.historical_context},
+    {icon:'🔑',label:'Key Verses',color:'#A07EB8',list:d.key_verses},
+    {icon:'🔍',label:'Interpretation',color:'#F0E0C0',content:d.interpretation},
+    {icon:'🎙️',label:'Sermon Angle',color:'#C8A050',sermon:d.sermon_angle},
+    {icon:'🔗',label:'Cross-References',color:'#7EB8A0',list:d.cross_references},
+    {icon:'🌍',label:'Ethiopian Orthodox Context',color:'#E8A030',content:d.ethiopian_context},
+    {icon:'🌿',label:'Life Application',color:'#B0A090',content:d.application},
+  ];
+  secs.forEach(s=>{
+    if(!s.content&&!s.list&&!s.sermon)return;
+    const div=document.createElement('div');
+    div.className='study-sec';
+    let inner='<div class="slabel" style="color:'+s.color+'"><span>'+s.icon+'</span><span>'+s.label+'</span></div>';
+    if(s.content)inner+='<div class="scontent">'+s.content+'</div>';
+    if(s.sermon)inner+='<div class="sermon-box">'+s.sermon+'</div>';
+    if(s.list&&s.list.length)inner+='<div class="scontent">'+s.list.map(i=>'<div style="margin-bottom:5px;padding-left:10px;border-left:2px solid '+s.color+'44;line-height:1.6;">'+i+'</div>').join('')+'</div>';
+    div.innerHTML=inner;sc.appendChild(div);
+  });
+}
+
+function runSearch(){
+  const q=document.getElementById('search-inp').value.trim();
+  if(!q)return;
+  document.getElementById('search-spinner').classList.remove('hidden');
+  document.getElementById('search-results').innerHTML='';
+  document.getElementById('search-err').classList.add('hidden');
+  document.getElementById('search-btn').disabled=true;
+  callClaude(SEARCH_SYS,q)
+    .then(data=>{
+      document.getElementById('search-spinner').classList.add('hidden');
+      document.getElementById('search-btn').disabled=false;
+      let html='';
+      if(data.summary)html+='<div id="search-summary">'+data.summary+'</div>';
+      html+='<div style="font-size:10px;color:#A88060;margin-bottom:10px;letter-spacing:0.1em;text-transform:uppercase;">'+(data.results?.length||0)+' results</div>';
+      (data.results||[]).forEach(r=>{
+        const bk=ALL_BOOKS.find(b=>b.name===r.book||r.book.includes(b.name));
+        const ob=bk?'<button class="btn btn-sm" onclick=\'showReader(ALL_BOOKS.find(b=>b.id===&quot;'+bk.id+'&quot;),'+r.chapter+')\'>Open →</button>':'';
+        html+='<div class="sr-item fade"><div class="sr-ref"><span>'+r.book+' '+r.chapter+':'+r.verse+'</span>'+ob+'</div><div class="sr-text">"'+r.text+'"</div><div class="sr-rel">'+r.relevance+'</div></div>';
+      });
+      document.getElementById('search-results').innerHTML=html;
+    })
+    .catch(()=>{
+      document.getElementById('search-spinner').classList.add('hidden');
+      document.getElementById('search-btn').disabled=false;
+      const eb=document.getElementById('search-err');
+      eb.innerHTML='Search failed. Check your connection and try again.';
+      eb.classList.remove('hidden');
+    });
+}
+
+function buildHome(){
+  const container=document.getElementById('home-books');
+  let html='';
+  CATEGORIES.forEach(cat=>{
+    html+='<div style="margin-bottom:28px;">';
+    html+='<div class="cat-header"><div class="cat-dot" style="background:'+cat.color+'"></div><div><div class="cat-title" style="color:'+cat.color+'">'+cat.label+'</div><div class="cat-sub">'+cat.desc+'</div></div></div>';
+    html+='<div class="book-grid">';
+    cat.books.forEach(book=>{
+      html+='<button class="book-card" data-id="'+book.id+'" style="border-left:3px solid '+cat.color+'"><div class="bn">'+book.name+'</div><div class="ba" style="color:'+cat.color+'">'+book.amharic+'</div><div class="bs">'+book.sub+' · '+book.chapters+' ch.</div></button>';
+    });
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.querySelectorAll('.book-card').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const bk=ALL_BOOKS.find(b=>b.id===el.dataset.id);
+      if(bk)showReader(bk,1);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  buildHome();
+  document.getElementById('home-search-inp').addEventListener('keydown',e=>{if(e.key==='Enter')goSearch();});
+});
+</script>
+</body>
+</html>
